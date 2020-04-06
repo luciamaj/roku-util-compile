@@ -56,7 +56,9 @@ function main(isInit) {
             console.log("callback listen");        
         });
 
-        location.href = __dirname + configSaved.app + "\\index.html";
+        console.log("APP DA APRIREEEEEEE", configSaved.app);
+
+        location.href = __dirname + configSaved.app + "\\layout\\index.html";
     }
 
     function emitPeriferica() {
