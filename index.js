@@ -67,7 +67,7 @@ function main(isInit) {
             let name = registry.networking.un;
             console.log("NAME", name);
 
-            centrale.emit('periferica', {machineName: name, name: name, infoDebug: infoDebug});
+            centrale.emit('periferica', {machineName: name, name: machineName, infoDebug: infoDebug});
         });
     }
 
