@@ -9,17 +9,12 @@ function main(isInit) {
     var fileRead = false;
     var configSaved = {};
     
-    let name = "";
     let machineName = "brightsign";
     let centrale = ioclient(config.centrale);
 
     if(isInit) {
         var registryClass = require("@brightsign/registry");
         var registry = new registryClass();
-
-        registry.read().then(function(registry) {
-            name = JSON.stringify(registry.networking.un);
-        });
 
         centrale.on('config', function (dataArr) {
             console.log(dataArr, `from central`);
@@ -65,7 +60,15 @@ function main(isInit) {
     }
 
     function emitPeriferica() {
-        centrale.emit('periferica', {machineName: machineName, name: name, infoDebug: infoDebug});
+        var registryClass = require("@brightsign/registry");
+        var registry = new registryClass();
+
+        registry.read().then(function(registry) {
+            let name = registry.networking.un;
+            console.log("NAME", name);
+
+            centrale.emit('periferica', {machineName: name, name: name, infoDebug: infoDebug});
+        });
     }
 
     centrale.on('connect', function () {

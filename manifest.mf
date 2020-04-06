@@ -1,7 +1,7 @@
 CACHE:
 index.html
 bundle.js
-# casa/index.html
+casa/index.html
 # produzione1/dist/fire4.jpg
 # produzione1/dist/index.html
 # produzione1/dist/build.js
