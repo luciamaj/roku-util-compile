@@ -2,20 +2,24 @@ function main(isInit) {
     const ioclient = require('socket.io-client');
     const http = require('http');
 
-    const { executeCmd } = require(__dirname + '/moudules/commands.js');
+    const { executeCmd } = require(__dirname + '/modules/commands.js');
     const { config } = require(__dirname + '/config/config.js');
 
     let infoDebug = {"error-chromiumcrashed": null, "error-pageerror": null, "error-requestfailed": null, "console": []}
     var fileRead = false;
     var configSaved = {};
     
-    let name = config.name;
-    let machineName = config.machineName;
+    let name = "";
+    let machineName = "brightsign";
     let centrale = ioclient(config.centrale);
 
     if(isInit) {
         var registryClass = require("@brightsign/registry");
         var registry = new registryClass();
+
+        registry.read().then(function(registry) {
+            name = JSON.stringify(registry.networking.un);
+        });
 
         centrale.on('config', function (dataArr) {
             console.log(dataArr, `from central`);
@@ -30,7 +34,7 @@ function main(isInit) {
         centrale.on('connect_error', function() {
             console.log("CONNECTION ERROR");
             if(fileRead == false) {
-                registry.read("appdata").then( function(registry){
+                registry.read("appdata").then(function(registry){
                     console.log(JSON.stringify(registry));
                     configSaved = registry;
                     openAppAndServer();
@@ -56,8 +60,6 @@ function main(isInit) {
         server.listen(config.port, function() {
             console.log("callback listen");        
         });
-
-        console.log("CONFIGSAVED". configSaved);
 
         location.href = __dirname + configSaved.app + "\\index.html";
     }
