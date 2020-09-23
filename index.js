@@ -1,3 +1,18 @@
+function sendudp() {
+    console.log("seeenndddd");
+
+    const dgram = require('dgram');
+    var client = dgram.createSocket('udp4');
+    var data = Buffer.from('finecicle');
+    client.send(data, 5000, '192.168.0.104', function(error) {
+      if (error) {
+        client.close();
+      } else {
+        console.log('Data sent!!!');
+      }
+    });
+}
+
 function main(isInit) {
     const ioclient = require('socket.io-client');
     const http = require('http');
@@ -12,33 +27,33 @@ function main(isInit) {
     let machineName = "brightsign";
     let centrale = ioclient(config.centrale);
 
-    if(isInit) {
-        var registryClass = require("@brightsign/registry");
-        var registry = new registryClass();
+    var registryClass = require("@brightsign/registry");
+    var registry = new registryClass();
 
-        centrale.on('config', function (dataArr) {
-            console.log(dataArr, `from central`);
-            configSaved = dataArr;
+    centrale.on('config', function (dataArr) {
+        console.log(dataArr, `from central`);
+        configSaved = dataArr;
 
-            registry.write({"appdata": dataArr}).then( function(){
-                console.log("Write Successful");
+        registry.write({"appdata": dataArr}).then( function(){
+            console.log("Write Successful");
+            if (isInit) {
                 openAppAndServer();
-            });
-        });
-
-        centrale.on('connect_error', function() {
-            console.log("CONNECTION ERROR");
-            if(fileRead == false) {
-                registry.read("appdata").then(function(registry){
-                    console.log(JSON.stringify(registry));
-                    configSaved = registry;
-                    openAppAndServer();
-                });
             }
         });
-    } else {
-        console.log("SONO SULLA PAGINA", configSaved.app);
-    }
+    });
+
+    centrale.on('connect_error', function() {
+        console.log("CONNECTION ERROR");
+        if(fileRead == false) {
+            registry.read("appdata").then(function(registry){
+                console.log(JSON.stringify(registry));
+                configSaved = registry;
+                if (isInit) {
+                    openAppAndServer();
+                }
+            });
+        }
+    });
 
     centrale.on('cmd', function(cmd) {
         executeCmd(cmd);
@@ -49,6 +64,7 @@ function main(isInit) {
             res.writeHead(200, {'Content-Type': 'text/plain'});
             res.write('Listening to port: ' + config.port);
             res.write('Config: ' + configSaved.app);
+            res.write('Node version ' + Number(process.version.match(/^v(\d+\.\d+)/)[1]));
             res.end();
         });
 
@@ -58,6 +74,7 @@ function main(isInit) {
 
         console.log("APP DA APRIREEEEEEE", configSaved.app);
 
+        //location.href = __dirname + configSaved.app + "\\layout\\index.html";
         location.href = __dirname + configSaved.app + "\\layout\\index.html";
     }
 
@@ -67,6 +84,7 @@ function main(isInit) {
 
         registry.read().then(function(registry) {
             let name = registry.networking.un;
+            global.name = name;
             console.log("NAME", name);
 
             centrale.emit('periferica', {machineName: machineName, name: name, infoDebug: infoDebug});
@@ -83,4 +101,30 @@ function main(isInit) {
     });
 }
 
+function interno() {
+    const { config } = require(__dirname + '/config/config.js');
+
+    const ioclient = require('socket.io-client');
+    let centrale = ioclient(config.centrale);
+
+    centrale.on('config', function (dataArr) {
+        console.log(dataArr, `from central`);
+    });
+
+    centrale.on('connect', function () {
+        console.log(`connected to central`);
+        emitPeriferica2();
+    });
+
+    function emitPeriferica2() {
+        let machineName = "brightsign";
+        let name = global.name;
+
+        let infoDebug = {"error-chromiumcrashed": null, "error-pageerror": null, "error-requestfailed": null, "console": []}
+        centrale.emit('periferica', {machineName: machineName, name: name, infoDebug: infoDebug});
+    }
+}
+
 window.main = main;
+window.interno = interno;
+window.sendudp = sendudp;

@@ -1,6 +1,6 @@
 let config = {
-    centrale: "http://192.168.1.18:3030",
-    port: 6000,
+    centrale: "http://marcegaglia-desk.eadev.it:3030",
+    port: 3030,
 }
 
 exports.config = config;
