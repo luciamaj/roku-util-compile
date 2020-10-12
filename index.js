@@ -1,16 +1,36 @@
 function sendudp() {
-    console.log("seeenndddd");
-
     const dgram = require('dgram');
     var client = dgram.createSocket('udp4');
-    var data = Buffer.from('finecicle');
-    client.send(data, 5000, '192.168.0.104', function(error) {
+    var data = Buffer.from('fine ciclo');
+    client.send(data, 5000, '192.168.0.129', function(error) {
       if (error) {
         client.close();
       } else {
         console.log('Data sent!!!');
       }
     });
+}
+
+function receiveudp() {
+    const dgram = require('dgram');
+    const server = dgram.createSocket('udp4');
+
+    server.on('error', (err) => {
+        console.log(`server error:\n${err.stack}`);
+        server.close();
+    });
+
+    server.on('message', (msg, rinfo) => {
+        console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+        return msg;
+    });
+
+    server.on('listening', () => {
+        var address = server.address();
+        console.log(`server listening ${address.address}:${address.port}`);
+    });
+
+    server.bind(31313);
 }
 
 function main(isInit) {
@@ -128,3 +148,4 @@ function interno() {
 window.main = main;
 window.interno = interno;
 window.sendudp = sendudp;
+window.receiveudp = receiveudp;

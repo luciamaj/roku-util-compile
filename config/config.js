@@ -1,5 +1,5 @@
 let config = {
-    centrale: "http://marcegaglia-desk.eadev.it:3030",
+    centrale: "http://192.168.0.107:7777",
     port: 3030,
 }
 
