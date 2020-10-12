@@ -145,7 +145,12 @@ function interno() {
     }
 }
 
+function provaprint() {
+    console.log('una prova del print, vedo la funzione?');
+}
+
 window.main = main;
 window.interno = interno;
 window.sendudp = sendudp;
 window.receiveudp = receiveudp;
+window.provaprint = provaprint;
