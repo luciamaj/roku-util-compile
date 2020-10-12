@@ -11,28 +11,6 @@ function sendudp() {
     });
 }
 
-function receiveudp() {
-    const dgram = require('dgram');
-    const server = dgram.createSocket('udp4');
-
-    server.on('error', (err) => {
-        console.log(`server error:\n${err.stack}`);
-        server.close();
-    });
-
-    server.on('message', (msg, rinfo) => {
-        console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-        return msg;
-    });
-
-    server.on('listening', () => {
-        var address = server.address();
-        console.log(`server listening ${address.address}:${address.port}`);
-    });
-
-    server.bind(31313);
-}
-
 function main(isInit) {
     const ioclient = require('socket.io-client');
     const http = require('http');
@@ -133,24 +111,42 @@ function interno() {
 
     centrale.on('connect', function () {
         console.log(`connected to central`);
-        emitPeriferica2();
+        emitPeriferica();
     });
 
-    function emitPeriferica2() {
+    function emitPeriferica() {
         let machineName = "brightsign";
         let name = global.name;
 
         let infoDebug = {"error-chromiumcrashed": null, "error-pageerror": null, "error-requestfailed": null, "console": []}
         centrale.emit('periferica', {machineName: machineName, name: name, infoDebug: infoDebug});
     }
-}
 
-function provaprint() {
-    console.log('una prova del print, vedo la funzione?');
+    function receiveudp() {
+        const dgram = require('dgram');
+        const server = dgram.createSocket('udp4');
+    
+        server.on('error', (err) => {
+            console.log(`server error:\n${err.stack}`);
+            server.close();
+        });
+    
+        server.on('message', (msg, rinfo) => {
+            console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+            return msg;
+        });
+    
+        server.on('listening', () => {
+            var address = server.address();
+            console.log(`server listening ${address.address}:${address.port}`);
+        });
+    
+        server.bind(31313);
+    }
+
+    receiveudp();
 }
 
 window.main = main;
 window.interno = interno;
 window.sendudp = sendudp;
-window.receiveudp = receiveudp;
-window.provaprint = provaprint;
